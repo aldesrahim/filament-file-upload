@@ -7,6 +7,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Filesystem\AwsS3V3Adapter;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -165,6 +166,14 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
                     );
                 } catch (Throwable $exception) {
                     // This driver does not support creating temporary URLs.
+                }
+            }
+
+            if (! $url && $storage instanceof AwsS3V3Adapter) {
+                try {
+                    $url = $storage->publicUrl($file);
+                } catch (Throwable $exception) {
+                    // This driver does not support creating public URLs.
                 }
             }
 
